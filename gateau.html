@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Le Gâteau</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fef2f2;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #ff3366;
+            font-size: 2.5em;
+            margin-top: 20px;
+        }
+        .button {
+            padding: 12px 25px;
+            background-color: #ff3366;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+        .button:hover {
+            background-color: #7fe8ff;
+        }
+
+        /* Emoji gâteau */
+        .cake-emoji {
+            font-size: 150px;
+            margin-top: 40px;
+        }
+
+        /* Effet pour souffler sur les bougies */
+        .wish-bar {
+            margin-top: 50px;
+            padding: 15px 30px;
+            background-color: #ff3366;
+            color: white;
+            border-radius: 30px;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: inline-block;
+        }
+        .wish-bar:hover {
+            background-color: #91e7ff;
+        }
+
+        /* Champ de texte pour saisir un vœu */
+        .wish-input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            border: 2px solid #ff3366;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .wish-message {
+            font-size: 1.5em;
+            color: #00bfff;
+            font-weight: bold;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 2s;
+        }
+
+        /* Animation pour simuler le souffle */
+        .wish-bar:active {
+            transform: scale(0.95);
+            animation: blow 0.5s ease-in-out;
+        }
+
+        @keyframes blow {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            .cake-emoji {
+                font-size: 120px;
+            }
+            .wish-bar {
+                font-size: 1.2em;
+                padding: 12px 20px;
+            }
+            .wish-input {
+                font-size: 1em;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Le Gâteau 🎂</h1>
+    <p>Voici un gâteau d'anniversaire pour toi</p>
+
+    <!-- Emoji gâteau géant -->
+    <div class="cake-emoji">🍰</div>
+
+    <p>Fais un vœu et souffle sur les bougies ! 🎉</p>
+
+    <!-- Champ de texte pour saisir un vœu -->
+    <input type="text" id="wish-input" class="wish-input" placeholder="Écris ton vœu ici...">
+
+    <!-- Barre de souffle pour faire un vœu -->
+    <div class="wish-bar" onclick="makeAWish()">Souffler et faire un vœu</div>
+
+    <!-- Message de vœux -->
+    <div id="wish-message" class="wish-message">✨ Que ton vœu se réalise ! ✨</div>
+
+    <button class="button" onclick="window.location.href='index.html'">Retour à la page principale</button>
+
+    <script>
+        function makeAWish() {
+            // Récupérer le vœu saisi
+            const wishInput = document.getElementById('wish-input').value;
+
+            // Vérifier si un vœu a été écrit
+            if (wishInput.trim() !== "") {
+                // Afficher le message de vœu
+                const wishMessage = document.getElementById('wish-message');
+                wishMessage.textContent = `✨ Ton vœu : "${wishInput}" se réalisera ! ✨`;
+                wishMessage.style.opacity = 1;
+
+                // Effet de souffle sur les bougies
+                setTimeout(() => {
+                    alert(`Soufflé avec succès ! Ton vœu : "${wishInput}" se réalise !`);
+                }, 500); // Delay avant l'alerte
+            } else {
+                // Si aucun vœu n'est écrit, afficher un message d'erreur
+                alert("Tu dois écrire un vœu avant de souffler !");
+            }
+        }
+    </script>
+</body>
+</html>
