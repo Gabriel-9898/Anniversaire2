@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choisissez votre Cadeau</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8e1f4; /* Fond rose pastel */
+            color: #333;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h2 {
+            color: #e91e63; /* Rose vif */
+            font-size: 36px;
+            margin-bottom: 40px;
+            font-weight: bold;
+        }
+
+        .decorations {
+            font-size: 30px;
+            color: #ff4081;
+        }
+
+        .cadeaux-container {
+            display: flex;
+            justify-content: space-evenly;
+            gap: 40px; /* Espacement entre les cadeaux */
+            margin-top: 50px;
+        }
+
+        .cadeau {
+            font-size: 100px; /* Taille des cadeaux */
+            cursor: pointer;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            width: 100px;
+            height: 100px;
+        }
+
+        .cadeau:hover {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        .message {
+            margin-top: 30px;
+            font-size: 24px;
+            color: #e91e63;
+            font-weight: bold;
+            visibility: hidden; /* Texte caché par défaut */
+        }
+
+        .message span {
+            font-weight: normal;
+        }
+
+        .cadeaux-container div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cadeau img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .button-container {
+            margin-top: 60px; /* Ajouté un peu plus d'espace avant le bouton */
+        }
+
+        .btn-retour {
+            background-color: #e91e63; /* Rose vif */
+            color: white;
+            padding: 15px 30px;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 30px; /* Coins encore plus arrondis */
+            text-decoration: none;
+        }
+
+        .btn-retour:hover {
+            background-color: #88ddf7; /* Teinte plus foncée au survol */
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🎉 Ouvres tes cadeaux d'anniversaire ! 🎉</h2>
+
+    <!-- Décorations supplémentaires -->
+    <div class="decorations">
+        🎈🎂🎁🎉🎊
+    </div>
+
+    <div class="cadeaux-container">
+        <div>
+            <div class="cadeau" id="cadeau1" onclick="ouvrirCadeau(1)">🎁</div>
+            <div id="message1" class="message">
+                Tu as gagné un voyage ! ✈️
+            </div>
+        </div>
+        <div>
+            <div class="cadeau" id="cadeau2" onclick="ouvrirCadeau(2)">🎁</div>
+            <div id="message2" class="message">
+                Tu as gagné des mangas ! 📚
+            </div>
+        </div>
+        <div>
+            <div class="cadeau" id="cadeau3" onclick="ouvrirCadeau(3)">🎁</div>
+            <div id="message3" class="message">
+                Tu as gagné des roses ! 🌹
+            </div>
+        </div>
+        <div>
+            <div class="cadeau" id="cadeau4" onclick="ouvrirCadeau(4)">🎁</div>
+            <div id="message4" class="message">
+                Tu as gagné un bijou ! 💍
+            </div>
+        </div>
+    </div>
+
+    <!-- Bouton retour à l'accueil -->
+    <div class="button-container">
+        <a href="index.html" class="btn-retour">Retour à l'accueil</a>
+    </div>
+
+    <script>
+        function ouvrirCadeau(cadeauId) {
+            const messageElement = document.getElementById("message" + cadeauId);
+            const cadeauElement = document.getElementById("cadeau" + cadeauId);
+
+            // Transformer l'émoji cadeau en un autre en fonction de l'ID
+            if (cadeauId === 1) {
+                cadeauElement.textContent = '✈️';  // Billet d'avion
+            } else if (cadeauId === 2) {
+                cadeauElement.textContent = '📚';  // Livre
+            } else if (cadeauId === 3) {
+                cadeauElement.textContent = '🌹';  // Roses
+            } else if (cadeauId === 4) {
+                cadeauElement.textContent = '💍';  // Bijou
+            }
+
+            // Afficher le message correspondant
+            messageElement.style.visibility = 'visible'; // Le texte devient visible
+        }
+    </script>
+
+</body>
+</html>

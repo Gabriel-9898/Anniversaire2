@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joyeux Anniversaire !</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fbd7ff;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Prend toute la hauteur de la fenêtre */
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #ff00ff;
+            font-size: 3em;
+            margin-top: 20px;
+        }
+
+        p {
+            font-size: 1.2em;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .heart {
+            color: #ff3366;
+            font-size: 3em;
+        }
+
+        .button {
+            padding: 12px 25px;
+            background-color: #ff3366;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2em;
+            margin-top: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px;
+        }
+
+        .button:hover {
+            background-color: #97eeff;
+        }
+
+        /* Confettis animation */
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .confetti {
+            position: absolute;
+            pointer-events: none;
+            z-index: 9999;
+            border-radius: 50%;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2em;
+            }
+            .button {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+        }
+
+        /* Nouveau bouton "Surprise !" centré */
+        #surpriseButton {
+            display: none;
+            margin-top: 30px;
+            padding: 12px 25px;
+            background-color: #ffcc00;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #surpriseButton:hover {
+            background-color: #ff9900;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bienvenue et Joyeux Anniversaire !</h1>
+    <p>Choisis une section pour explorer :</p>
+    <button class="button" onclick="visitPage('cadeau.html')">Section Cadeaux</button>
+    <button class="button" onclick="visitPage('gateau.html')">Section Gâteau</button>
+    <button class="button" onclick="visitPage('amour.html')">Section Amour</button>
+
+    <!-- Confettis -->
+    <div class="confetti-container">
+        <script>
+            // Fonction pour créer des confettis avec plus de couleurs et animation
+            function createConfetti() {
+                const confettiColors = ['#ff3366', '#00bfff', '#ffccff', '#1a1a1a', '#ff99cc'];
+                const numberOfConfetti = 200;
+
+                for (let i = 0; i < numberOfConfetti; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'absolute';
+                    confetti.style.width = Math.random() * 10 + 'px';
+                    confetti.style.height = Math.random() * 10 + 'px';
+                    confetti.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                    confetti.style.opacity = Math.random() * 0.7 + 0.3;
+                    confetti.style.animation = `fall ${Math.random() * 4 + 3}s linear infinite`;
+
+                    // Animation de rotation et de chute
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.top = Math.random() * window.innerHeight + 'px';
+                    confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                    document.body.appendChild(confetti);
+                }
+            }
+
+            // Lancer les confettis à l'ouverture de la page
+            createConfetti();
+
+            // Fonction pour enregistrer la visite de la page
+            function visitPage(page) {
+                localStorage.setItem(page, 'visited');
+                checkAllPagesVisited();
+                window.location.href = page;
+            }
+
+            // Vérifie si toutes les pages ont été visitées
+            function checkAllPagesVisited() {
+                const pages = ['cadeau.html', 'gateau.html', 'amour.html'];
+                let allVisited = true;
+
+                for (const page of pages) {
+                    if (!localStorage.getItem(page)) {
+                        allVisited = false;
+                        break;
+                    }
+                }
+
+                if (allVisited) {
+                    document.getElementById('surpriseButton').style.display = 'block';
+                }
+            }
+
+            // Initialiser la vérification au chargement de la page
+            window.onload = function() {
+                checkAllPagesVisited();
+            }
+        </script>
+    </div>
+
+    <!-- Surprise Button (hidden by default) -->
+    <button id="surpriseButton" onclick="window.location.href='surprise.html'">Surprise !</button>
+</body>
+</html>

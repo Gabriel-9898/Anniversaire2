@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu de l'anniversaire</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #FFB6C1, #B0E0E6);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            color: #333;
+            flex-direction: column;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #ef5fff;
+            margin-bottom: 20px;
+        }
+
+        .game-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 3px solid #ff61e5;
+        }
+
+        .gift, .heart, .broken-heart, .bomb {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            font-size: 30px;
+            display: none;
+            cursor: default;
+        }
+
+        .basket {
+            position: absolute;
+            font-size: 40px;
+            bottom: 0;
+            right: 10%;
+            transform: translateX(-50%);
+            user-select: none;
+        }
+
+        .score, .best-score {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .best-score {
+            color: #ff61e5; /* Couleur du meilleur score */
+        }
+
+        /* Styles pour le pop-up */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .popup h2 {
+            font-size: 1.5em;
+            color: #000000;
+        }
+
+        .popup button {
+            background-color: #f997ed;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+
+        .popup button:hover {
+            background-color: #a3eaff;
+        }
+
+        /* Bouton arrondi en bas de page */
+        .back-button {
+            position: fixed;
+            bottom: 0px;  /* Décalage du bas de la page */
+            left: 50%;
+            transform: translateX(-50%);  /* Centrer le bouton */
+            background-color: #ff61e5;  /* Couleur du bouton */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 30px;  /* Arrondir le bouton */
+            font-size: 1.2em;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;  /* Retirer la décoration du lien */
+        }
+
+        .back-button:hover {
+            background-color: #97eeff; /* Couleur au survol */
+        }
+
+        /* Hitboxes invisibles */
+        .hitbox {
+            position: absolute;
+            background-color: transparent;
+            border: 1px  1px solid transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <h1>Joyeux Anniversaire !</h1>
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="best-score">Meilleur Score: <span id="bestScoreDisplay">0</span></div> <!-- Meilleur score affiché -->
+        <div class="game-container">
+            <div id="basket" class="basket">🧺</div>
+            <div id="gift" class="gift">🎁</div>
+            <div id="heart" class="heart">❤️</div>
+            <div id="brokenHeart" class="broken-heart">💔</div>
+            <div id="bomb" class="bomb">💣</div>
+
+            <!-- Hitbox pour le panier -->
+            <div id="basketHitbox" class="hitbox"></div>
+
+            <!-- Hitbox pour le cadeau -->
+            <div id="giftHitbox" class="hitbox"></div>
+
+            <!-- Hitbox pour le cœur -->
+            <div id="heartHitbox" class="hitbox"></div>
+
+            <!-- Hitbox pour le cœur brisé -->
+            <div id="brokenHeartHitbox" class="hitbox"></div>
+
+            <!-- Hitbox pour la bombe -->
+            <div id="bombHitbox" class="hitbox"></div>
+        </div>
+    </div>
+
+    <!-- Pop-up de félicitations -->
+    <div id="popup" class="popup">
+        <h2>Game Over ! 💣</h2>
+        <div>Score : <span id="finalScore">0</span></div>
+        <div>Meilleur Score : <span id="bestScorePopup">0</span></div>
+        <button id="replayButton">Rejouer</button>
+    </div>
+
+    <footer><!-- Bouton pour revenir à la page d'accueil -->
+    <a href="index.html">
+        <button class="back-button">Retour à l'index</button>
+    </a>
+    </footer>
+
+    <script>
+        let score = 0;
+        let bestScore = localStorage.getItem('bestScore') || 0; // Charger le meilleur score depuis le stockage local
+        let gameInterval;
+        let itemInterval;
+        let isGameOver = false;
+        let difficultyLevel = 1; // Niveaux de difficulté
+
+        const gift = document.getElementById('gift');
+        const heart = document.getElementById('heart');
+        const brokenHeart = document.getElementById('brokenHeart');
+        const bomb = document.getElementById('bomb');
+        const basket = document.getElementById('basket');
+        const scoreElement = document.getElementById('score');
+        const bestScoreDisplay = document.getElementById('bestScoreDisplay');
+        const finalScoreElement = document.getElementById('finalScore');
+        const bestScorePopup = document.getElementById('bestScorePopup');
+        const popup = document.getElementById('popup');
+        const replayButton = document.getElementById('replayButton');
+        const basketHitbox = document.getElementById('basketHitbox');
+        const giftHitbox = document.getElementById('giftHitbox');
+        const heartHitbox = document.getElementById('heartHitbox');
+        const brokenHeartHitbox = document.getElementById('brokenHeartHitbox');
+        const bombHitbox = document.getElementById('bombHitbox');
+        let isDragging = false;
+        let startX;
+        let basketOffsetX;
+
+        // Mettre à jour la position des hitboxes en fonction des éléments
+        function updateHitboxes() {
+            const basketRect = basket.getBoundingClientRect();
+            const giftRect = gift.getBoundingClientRect();
+            const heartRect = heart.getBoundingClientRect();
+            const brokenHeartRect = brokenHeart.getBoundingClientRect();
+            const bombRect = bomb.getBoundingClientRect();
+
+            basketHitbox.style.width = basketRect.width + 'px';
+            basketHitbox.style.height = basketRect.height + 'px';
+            basketHitbox.style.left = basketRect.left + 'px';
+            basketHitbox.style.top = basketRect.top + 'px';
+
+            giftHitbox.style.width = giftRect.width + 'px';
+            giftHitbox.style.height = giftRect.height + 'px';
+            giftHitbox.style.left = giftRect.left + 'px';
+            giftHitbox.style.top = giftRect.top + 'px';
+
+            heartHitbox.style.width = heartRect.width + 'px';
+            heartHitbox.style.height = heartRect.height + 'px';
+            heartHitbox.style.left = heartRect.left + 'px';
+            heartHitbox.style.top = heartRect.top + 'px';
+
+            brokenHeartHitbox.style.width = brokenHeartRect.width + 'px';
+            brokenHeartHitbox.style.height = brokenHeartRect.height + 'px';
+            brokenHeartHitbox.style.left = brokenHeartRect.left + 'px';
+            brokenHeartHitbox.style.top = brokenHeartRect.top + 'px';
+
+            bombHitbox.style.width = bombRect.width + 'px';
+            bombHitbox.style.height = bombRect.height + 'px';
+            bombHitbox.style.left = bombRect.left + 'px';
+            bombHitbox.style.top = bombRect.top + 'px';
+        }
+
+        function moveBasket(event) {
+            const gameContainer = document.querySelector('.game-container');
+            const containerWidth = gameContainer.offsetWidth;
+            const basketWidth = basket.offsetWidth;
+
+            let newLeft = event.clientX - basketOffsetX;
+
+            if (newLeft < 0) {
+                newLeft = 0;
+            } else if (newLeft > containerWidth - basketWidth) {
+                newLeft = containerWidth - basketWidth;
+            }
+
+            basket.style.left = newLeft + 'px';
+            updateHitboxes(); // Mettre à jour la hitbox du panier
+        }
+
+        function startDragging(event) {
+            basketOffsetX = event.clientX - basket.offsetLeft;
+            isDragging = true;
+        }
+
+        function stopDragging() {
+            isDragging = false;
+        }
+
+        function generateItems() {
+            if (isGameOver) return;
+
+            const gameContainer = document.querySelector('.game-container');
+            const containerWidth = gameContainer.offsetWidth;
+            const giftWidth = gift.offsetWidth;
+            const heartWidth = heart.offsetWidth;
+            const brokenHeartWidth = brokenHeart.offsetWidth;
+            const bombWidth = bomb.offsetWidth;
+
+            const rand = Math.random();
+
+            if (rand < 0.3) { // 30% pour les cadeaux
+                const giftLeft = Math.random() * (containerWidth - giftWidth);
+                gift.style.left = giftLeft + 'px';
+                gift.style.top = '-50px';
+                gift.style.display = 'block';
+                fallItem(gift, 'gift');
+            } else if (rand < 0.6) { // 30% pour les cœurs
+                const heartLeft = Math.random() * (containerWidth - heartWidth);
+                heart.style.left = heartLeft + 'px';
+                heart.style.top = '-50px';
+                heart.style.display = 'block';
+                fallItem(heart, 'heart');
+            } else if (rand < 0.8) { // 20% pour les cœurs brisés
+                const brokenHeartLeft = Math.random() * (containerWidth - brokenHeartWidth);
+                brokenHeart.style.left = brokenHeartLeft + 'px';
+                brokenHeart.style.top = '-50px';
+                brokenHeart.style.display = 'block';
+                fallItem(brokenHeart, 'brokenHeart');
+            } else { // 20% pour les bombes
+                const bombLeft = Math.random() * (containerWidth - bombWidth);
+                bomb.style.left = bombLeft + 'px';
+                bomb.style.top = '-50px';
+                bomb.style.display = 'block';
+                fallItem(bomb, 'bomb');
+            }
+        }
+
+        function fallItem(item, type) {
+            const gameContainer = document.querySelector('.game-container');
+            let itemTop = parseInt(item.style.top);
+            let fallSpeed = 10 + difficultyLevel * 2;
+
+            itemInterval = setInterval(function () {
+                itemTop += fallSpeed;
+
+                if (itemTop > gameContainer.offsetHeight) {
+                    clearInterval(itemInterval);
+                    item.style.display = 'none';
+                    generateItems();
+                }
+
+                item.style.top = itemTop + 'px';
+                updateHitboxes(); // Mettre à jour la hitbox de l'objet
+
+                if (checkCollision(type)) {
+                    if (type === 'gift') {
+                        score++;
+                    } else if (type === 'heart') {
+                        score += 3;
+                    } else if (type === 'brokenHeart') {
+                        score -= 2;
+                    } else if (type === 'bomb') {
+                        gameOver();
+                    }
+
+                    scoreElement.textContent = `Score: ${score}`;
+                    clearInterval(itemInterval);
+                    item.style.display = 'none';
+                    generateItems();
+                }
+
+            }, 20);
+        }
+
+        function checkCollision(type) {
+            let itemRect, hitboxRect;
+
+            if (type === 'gift') {
+                itemRect = giftHitbox.getBoundingClientRect();
+                hitboxRect = basketHitbox.getBoundingClientRect();
+            } else if (type === 'heart') {
+                itemRect = heartHitbox.getBoundingClientRect();
+                hitboxRect = basketHitbox.getBoundingClientRect();
+            } else if (type === 'brokenHeart') {
+                itemRect = brokenHeartHitbox.getBoundingClientRect();
+                hitboxRect = basketHitbox.getBoundingClientRect();
+            } else if (type === 'bomb') {
+                itemRect = bombHitbox.getBoundingClientRect();
+                hitboxRect = basketHitbox.getBoundingClientRect();
+            }
+
+            return (
+                itemRect.bottom > hitboxRect.top &&
+                itemRect.top < hitboxRect.bottom &&
+                itemRect.left + itemRect.width > hitboxRect.left &&
+                itemRect.right < hitboxRect.right
+            );
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            if (score > bestScore) {
+                bestScore = score;  // Mettre à jour le meilleur score
+                localStorage.setItem('bestScore', bestScore); // Sauvegarder le meilleur score
+            }
+
+            finalScoreElement.textContent = score;
+            bestScorePopup.textContent = bestScore;
+            bestScoreDisplay.textContent = bestScore;  // Mettre à jour l'affichage du meilleur score
+            popup.style.display = 'block';
+            clearInterval(gameInterval);
+        }
+
+        function restartGame() {
+            score = 0;
+            difficultyLevel = 1;
+            scoreElement.textContent = `Score: ${score}`;
+            bestScoreDisplay.textContent = bestScore; // Réinitialiser l'affichage du meilleur score
+            popup.style.display = 'none';
+            isGameOver = false;
+            generateItems();
+            updateHitboxes();
+        }
+
+        replayButton.addEventListener('click', restartGame);
+
+        window.addEventListener('mousedown', startDragging);
+        window.addEventListener('mousemove', function (event) {
+            if (isDragging) {
+                moveBasket(event);
+            }
+        });
+        window.addEventListener('mouseup', stopDragging);
+        window.addEventListener('touchstart', startDragging);
+        window.addEventListener('touchmove', function (event) {
+            if (isDragging) {
+                moveBasket(event.touches[0]);
+            }
+        });
+        window.addEventListener('touchend', stopDragging);
+
+        generateItems();
+    </script>
+
+</body>
+</html>
